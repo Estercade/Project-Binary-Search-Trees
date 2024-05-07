@@ -28,7 +28,7 @@ function merge(left, right) {
 let sortedArr = mergeSort(arr);
 
 const Node = function(value = null) {
-  this.data = value;
+  this.value = value;
   this.left = null;
   this.right = null;
 }
@@ -60,9 +60,9 @@ const Tree = function(arr) {
     let current = root;
     while (true) {
       // throw error if the value is a duplicate
-      if (value === current.data) {
+      if (value === current.value) {
         throw new Error(`This is a duplicate value.`);
-      } else if (value < current.data) {
+      } else if (value < current.value) {
         if (!current.left) {
           current.left = newNode;
           return;
@@ -85,36 +85,115 @@ const Tree = function(arr) {
       return current;
     }
 
-    if (value < current.data) {
+    if (value < current.value) {
       current.left = deleteItem(value, current.left);
-    } else if (value > current.data) {
+    } else if (value > current.value) {
       current.right = deleteItem(value, current.right)
-    } else if (value === current.data) {
-      // if current has no children or only one child node
+    } else if (value === current.value) {
+      // if node to be deleted has no children or only one child node
       if (!current.left) {
         return current.right;
       } else if (!current.right) {
         return current.left;
       }
-      // if current has two children
-      current.data = _findInorderPredecessor(current.right);
-      current.right = deleteItem(current.data, current.right);
+      // if node to be deleted has two children
+      current.value = _findInorderPredecessor(current.right);
+      current.right = deleteItem(current.value, current.right);
     } else {
       throw new Error(`The given value was not found.`);
     }
     return current;
   }
 
+  // finds the value of the given node's inorder predecessor
   const _findInorderPredecessor = (current) => {
-    let predecessorValue = current.data;
+    let predecessorValue = current.value;
     while (current.left) {
-      predecessorValue = current.data;
+      predecessorValue = current.value;
       current = current.left;
     }
     return predecessorValue;
   }
 
-  return { get root() { return root }, insert, deleteItem };
+  // find(value) returns the node with the given value
+  const find = (value) => {
+    let current = root;
+
+    while (current) {
+      if (value === current.value) {
+        return current;
+      } else if (value < current.value) {
+        current = current.left;
+      } else {
+        current = current.right;
+      }
+    }
+    throw new Error(`The given value was not found.`);
+  }
+
+  // levelOrderIterative iteratively traverses the tree in breadth-first level order
+  // and provides each node as an argument to the optional callback function
+  // levelOrderIterative will return an array of values if no callback is given as an argument
+  const levelOrderIterative = (callback) => {
+    let arr = [];
+    let queue = [root];
+
+    while (queue.length > 0) {
+      let current = queue.shift();
+      if (current.left) {
+        queue.push(current.left);
+      }
+      if (current.right) {
+        queue.push(current.right);
+      }
+      if (callback) {
+        callback(queue);
+      } else {
+        arr.push(current);
+      }
+    }
+
+    if (!callback) {
+      return arr;
+    }
+  }
+
+  // levelOrderRecursive recursively traverses the tree in breadth-first level order
+  // and provides each node as an argument to the optional callback function
+  // levelOrderRecursive will return an array of values if no callback is given as an argument
+  const levelOrderRecursive = (callback) => {
+    let arr = [];
+    let queue = [root];
+    _queueRecursive(queue, arr, callback);
+    if (!callback) {
+      return arr;
+    }
+  }
+
+  const _queueRecursive = (queue, arr, callback) => {
+    // base case
+    if (!queue.length) {
+      return;
+    }
+    let newQueue = [];
+    while (queue.length > 0) {
+      let current = queue.shift();
+      if (current.left) {
+        newQueue.push(current.left);
+      }
+      if (current.right) {
+        newQueue.push(current.right);
+      }
+      if (callback) {
+        callback(current);
+      } else {
+        arr.push(current);
+      }
+    }
+    _queueRecursive(newQueue, arr, callback);
+  }
+
+  return { get root() { return root }, insert, deleteItem, find, levelOrderIterative, levelOrderRecursive };
 }
 
 const prettyPrint = (node, prefix = "", isLeft = true) => {
@@ -124,7 +203,7 @@ const prettyPrint = (node, prefix = "", isLeft = true) => {
   if (node.right !== null) {
     prettyPrint(node.right, `${prefix}${isLeft ? "│   " : "    "}`, false);
   }
-  console.log(`${prefix}${isLeft ? "└── " : "┌── "}${node.data}`);
+  console.log(`${prefix}${isLeft ? "└── " : "┌── "}${node.value}`);
   if (node.left !== null) {
     prettyPrint(node.left, `${prefix}${isLeft ? "    " : "│   "}`, true);
   }
@@ -132,5 +211,5 @@ const prettyPrint = (node, prefix = "", isLeft = true) => {
 
 let newBST = new Tree(sortedArr);
 prettyPrint(newBST.root);
-newBST.deleteItem(8);
-prettyPrint(newBST.root);
+console.log(newBST.levelOrderRecursive());
+// prettyPrint(newBST.root);
