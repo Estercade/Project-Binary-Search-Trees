@@ -290,15 +290,15 @@ export const Tree = function(arr) {
     return 1 + _findDepthRecursive(newQueue, node);
   }
 
-  // isBalanced checks if the tree is balanced.
+  // isBalancedIterative checks if the tree is balanced iteratively.
   // A tree is balanced if the height difference between the left and right subtrees
   // of every node is no more than 1.
-  const isBalanced = () => {
+  const isBalancedIterative = () => {
     let queue = [root];
 
     while (queue.length > 0) {
       let current = queue.shift();
-      if (height(current.left) - height(current.right) > 1 || height(current.right) - height(current.left) > 1) {
+      if (Math.abs(leftResult.height - rightResult.height) > 1) {
         return false;
       }
       if (current.left) {
@@ -309,6 +309,33 @@ export const Tree = function(arr) {
       }
     }
     return true;
+  }
+
+  // isBalanced checks if the tree is balanced.
+  // A tree is balanced if the height difference between the left and right subtrees
+  // of every node is no more than 1.
+  const isBalanced = () => {
+    let result = isBalancedRecursive(root);
+    return result.balanced;
+  }
+
+  const isBalancedRecursive = (current) => {
+    // base case
+    if (current === null) {
+      return { height: 0, balanced: true };
+    }
+    
+    let leftResult = isBalancedRecursive(current.left);
+    let rightResult = isBalancedRecursive(current.right);
+
+    if (Math.abs(leftResult.height - rightResult.height) > 1 || leftResult.balanced === false || rightResult.balanced === false) {
+      return { height: -1, balanced: false };
+    }
+
+    return {
+      height: 1 + Math.max(leftResult.height, rightResult.height),
+      balanced: true
+    }
   }
 
   // rebalance rebalances an unbalanced tree.
