@@ -342,10 +342,6 @@ const prettyPrint = (node, prefix = "", isLeft = true) => {
   }
 };
 
-function print(value) {
-  console.log(value.value);
-}
-
 let newBST = new Tree(sortedArr);
 newBST.insert(2.5);
 prettyPrint(newBST.root);
