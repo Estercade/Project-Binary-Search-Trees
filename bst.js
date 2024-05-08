@@ -134,6 +134,7 @@ const Tree = function(arr) {
   // and provides each node as an argument to the optional callback function.
   // levelOrderIterative will return an array of values if no callback is given as an argument.
   const levelOrderIterative = (callback) => {
+    const isCallback = typeof(callback) === "function";
     let arr = [];
     let queue = [root];
 
@@ -145,14 +146,10 @@ const Tree = function(arr) {
       if (current.right) {
         queue.push(current.right);
       }
-      if (callback) {
-        callback(queue);
-      } else {
-        arr.push(current);
-      }
+      isCallback ? callback(current) : arr.push(current);
     }
 
-    if (!callback) {
+    if (!isCallback) {
       return arr;
     }
   }
@@ -161,14 +158,15 @@ const Tree = function(arr) {
   // and provides each node as an argument to the optional callback function.
   // levelOrderRecursive will return an array of values if no callback is given as an argument.
   const levelOrderRecursive = (callback) => {
+    const isCallback = typeof(callback) === "function";
     let arr = [];
-    _levelOrderQueueRecursive([root], arr, callback);
-    if (!callback) {
+    _levelOrderQueueRecursive([root], arr, isCallback, callback);
+    if (!isCallback) {
       return arr;
     }
   }
 
-  const _levelOrderQueueRecursive = (queue, arr, callback) => {
+  const _levelOrderQueueRecursive = (queue, arr, isCallback, callback) => {
     // base case
     if (!queue.length) {
       return;
@@ -182,30 +180,31 @@ const Tree = function(arr) {
       if (current.right) {
         newQueue.push(current.right);
       }
-      callback ? callback(current) : arr.push(current);
+      isCallback ? callback(current) : arr.push(current);
     }
-    _levelOrderQueueRecursive(newQueue, arr, callback);
+    _levelOrderQueueRecursive(newQueue, arr, isCallback, callback);
   }
 
   // inOrder(callback) traverses the tree in inorder depth-first-order 
   // and provides each node as an argument to the optional callback function.
   // levelOrderRecursive will return an array of values if no callback is given as an argument.
   const inOrder = (callback) => {
+    const isCallback = typeof(callback) === "function";
     let arr = [];
 
-    _inOrderQueueRecursive(root, arr, callback);
+    _inOrderQueueRecursive(root, arr, isCallback, callback);
 
-    function _inOrderQueueRecursive(current, arr, callback) {
+    function _inOrderQueueRecursive(current, arr, isCallback, callback) {
       if (current.left) {
-        _inOrderQueueRecursive(current.left, arr, callback);
+        _inOrderQueueRecursive(current.left, arr, isCallback, callback);
       }
-      callback ? callback(current) : arr.push(current);
+      isCallback ? callback(current) : arr.push(current);
       if (current.right) {
-        _inOrderQueueRecursive(current.right, arr, callback);
+        _inOrderQueueRecursive(current.right, arr, isCallback, callback);
       }
     }
 
-    if (!callback) {
+    if (!isCallback) {
       return arr;
     }
   }
@@ -214,21 +213,22 @@ const Tree = function(arr) {
   // and provides each node as an argument to the optional callback function.
   // levelOrderRecursive will return an array of values if no callback is given as an argument.
   const preOrder = (callback) => {
+    const isCallback = typeof(callback) === "function";
     let arr = [];
 
-    _preOrderQueueRecursive(root, arr, callback);
+    _preOrderQueueRecursive(root, arr, isCallback, callback);
 
-    function _preOrderQueueRecursive(current, arr, callback) {
-      callback ? callback(current) : arr.push(current);
+    function _preOrderQueueRecursive(current, arr, isCallback, callback) {
+      isCallback ? callback(current) : arr.push(current);
       if (current.left) {
-        _preOrderQueueRecursive(current.left, arr, callback);
+        _preOrderQueueRecursive(current.left, arr, isCallback, callback);
       }
       if (current.right) {
-        _preOrderQueueRecursive(current.right, arr, callback);
+        _preOrderQueueRecursive(current.right, arr, isCallback, callback);
       }
     }
 
-    if (!callback) {
+    if (!isCallback) {
       return arr;
     }
   }
@@ -237,21 +237,22 @@ const Tree = function(arr) {
   // and provides each node as an argument to the optional callback function.
   // levelOrderRecursive will return an array of values if no callback is given as an argument.
   const postOrder = (callback) => {
+    const isCallback = typeof(callback) === "function";
     let arr = [];
 
-    _postOrderQueueRecursive(root, arr, callback);
+    _postOrderQueueRecursive(root, arr, isCallback, callback);
 
-    function _postOrderQueueRecursive(current, arr, callback) {
+    function _postOrderQueueRecursive(current, arr, isCallback, callback) {
       if (current.left) {
-        _postOrderQueueRecursive(current.left, arr, callback);
+        _postOrderQueueRecursive(current.left, arr, isCallback, callback);
       }
       if (current.right) {
-        _postOrderQueueRecursive(current.right, arr, callback);
+        _postOrderQueueRecursive(current.right, arr, isCallback, callback);
       }
-      callback ? callback(current) : arr.push(current);
+      isCallback ? callback(current) : arr.push(current);
     }
 
-    if (!callback) {
+    if (arr.length > 0) {
       return arr;
     }
   }
@@ -293,13 +294,39 @@ const Tree = function(arr) {
     return 1 + _findDepthRecursive(newQueue, node);
   }
 
+  // isBalanced checks if the tree is balanced.
+  // A tree is balanced if the height difference between the left and right subtrees
+  // of every node is no more than 1.
   const isBalanced = () => {
-    let leftHeight = height(root.left);
-    let rightHeight = height(root.right);
-    return leftHeight === rightHeight || leftHeight === rightHeight + 1 || leftHeight === rightHeight - 1;
+    let queue = [root];
+
+    while (queue.length > 0) {
+      let current = queue.shift();
+      if (height(current.left) - height(current.right) > 1 || height(current.right) - height(current.left) > 1) {
+        return false;
+      }
+      if (current.left) {
+        queue.push(current.left);
+      }
+      if (current.right) {
+        queue.push(current.right);
+      }
+    }
+    return true;
   }
 
-  return { get root() { return root }, insert, deleteItem, find, levelOrderIterative, levelOrderRecursive, inOrder, preOrder, postOrder, height, depth, isBalanced };
+  // rebalance rebalances an unbalanced tree.
+  const rebalance = () => {
+    if (!root.isBalanced) {
+      let newArray = [];
+    // traverses the tree to generate a new array of node values
+    levelOrderIterative((node) => {newArray.push(node.value)});
+    let newSortedArray = mergeSort(newArray);
+    root = buildTree(newSortedArray);
+    }
+  }
+
+  return { get root() { return root }, insert, deleteItem, find, levelOrderIterative, levelOrderRecursive, inOrder, preOrder, postOrder, height, depth, isBalanced, rebalance };
 }
 
 const prettyPrint = (node, prefix = "", isLeft = true) => {
@@ -315,8 +342,12 @@ const prettyPrint = (node, prefix = "", isLeft = true) => {
   }
 };
 
+function print(value) {
+  console.log(value.value);
+}
+
 let newBST = new Tree(sortedArr);
+newBST.insert(2.5);
 prettyPrint(newBST.root);
-// prettyPrint(newBST.root);
-console.log(newBST.isBalanced());
-// prettyPrint(newBST.root);
+newBST.rebalance();
+prettyPrint(newBST.root);
