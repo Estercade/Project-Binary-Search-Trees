@@ -1,6 +1,4 @@
-let arr = [1, 7, 4, 23, 8, 9, 4, 3, 5, 7, 9, 67, 6345, 324];
-
-function mergeSort(arr) {
+export const mergeSort = (arr) => {
   if (arr.length <= 1) {
     return arr;
   }
@@ -25,15 +23,13 @@ function merge(left, right) {
   return [...sorted, ...left, ...right];
 }
 
-let sortedArr = mergeSort(arr);
-
-const Node = function(value = null) {
+export const Node = function(value = null) {
   this.value = value;
   this.left = null;
   this.right = null;
 }
 
-const Tree = function(arr) {
+export const Tree = function(arr) {
 
   // buildTree takes a sorted array of numbers and returns a balanced binary search tree.
   const buildTree = (arr, start = 0, end = arr.length - 1) => {
@@ -317,9 +313,10 @@ const Tree = function(arr) {
 
   // rebalance rebalances an unbalanced tree.
   const rebalance = () => {
+    // check if tree is balanced
     if (!root.isBalanced) {
       let newArray = [];
-    // traverses the tree to generate a new array of node values
+    // if tree is unbalanced, traverse the tree to generate a new array of node values
     levelOrderIterative((node) => {newArray.push(node.value)});
     let newSortedArray = mergeSort(newArray);
     root = buildTree(newSortedArray);
@@ -329,7 +326,7 @@ const Tree = function(arr) {
   return { get root() { return root }, insert, deleteItem, find, levelOrderIterative, levelOrderRecursive, inOrder, preOrder, postOrder, height, depth, isBalanced, rebalance };
 }
 
-const prettyPrint = (node, prefix = "", isLeft = true) => {
+export const prettyPrint = (node, prefix = "", isLeft = true) => {
   if (node === null) {
     return;
   }
@@ -341,9 +338,3 @@ const prettyPrint = (node, prefix = "", isLeft = true) => {
     prettyPrint(node.left, `${prefix}${isLeft ? "    " : "│   "}`, true);
   }
 };
-
-let newBST = new Tree(sortedArr);
-newBST.insert(2.5);
-prettyPrint(newBST.root);
-newBST.rebalance();
-prettyPrint(newBST.root);
