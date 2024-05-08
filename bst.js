@@ -163,14 +163,13 @@ const Tree = function(arr) {
   // levelOrderRecursive will return an array of values if no callback is given as an argument
   const levelOrderRecursive = (callback) => {
     let arr = [];
-    let queue = [root];
-    _queueRecursive(queue, arr, callback);
+    _levelOrderQueueRecursive([root], arr, callback);
     if (!callback) {
       return arr;
     }
   }
 
-  const _queueRecursive = (queue, arr, callback) => {
+  const _levelOrderQueueRecursive = (queue, arr, callback) => {
     // base case
     if (!queue.length) {
       return;
@@ -184,16 +183,81 @@ const Tree = function(arr) {
       if (current.right) {
         newQueue.push(current.right);
       }
-      if (callback) {
-        callback(current);
-      } else {
-        arr.push(current);
-      }
+      callback ? callback(current) : arr.push(current);
     }
-    _queueRecursive(newQueue, arr, callback);
+    _levelOrderQueueRecursive(newQueue, arr, callback);
   }
 
-  return { get root() { return root }, insert, deleteItem, find, levelOrderIterative, levelOrderRecursive };
+  // inOrder(callback) traverses the tree in inorder depth-first-order 
+    // and provides each node as an argument to the optional callback function
+  // levelOrderRecursive will return an array of values if no callback is given as an argument
+  const inOrder = (callback) => {
+    let arr = [];
+
+    _inOrderQueueRecursive(root, arr, callback);
+
+    function _inOrderQueueRecursive(current, arr, callback) {
+      if (current.left) {
+        _inOrderQueueRecursive(current.left, arr, callback);
+      }
+      callback ? callback(current) : arr.push(current);
+      if (current.right) {
+        _inOrderQueueRecursive(current.right, arr, callback);
+      }
+    }
+
+    if (!callback) {
+      return arr;
+    }
+  }
+
+  // preOrder(callback) traverses the tree in preOrder depth-first-order 
+  // and provides each node as an argument to the optional callback function
+  // levelOrderRecursive will return an array of values if no callback is given as an argument
+  const preOrder = (callback) => {
+    let arr = [];
+
+    _preOrderQueueRecursive(root, arr, callback);
+
+    function _preOrderQueueRecursive(current, arr, callback) {
+      callback ? callback(current) : arr.push(current);
+      if (current.left) {
+        _preOrderQueueRecursive(current.left, arr, callback);
+      }
+      if (current.right) {
+        _preOrderQueueRecursive(current.right, arr, callback);
+      }
+    }
+
+    if (!callback) {
+      return arr;
+    }
+  }
+
+  // postOrder(callback) traverses the tree in postOrder depth-first-order 
+  // and provides each node as an argument to the optional callback function
+  // levelOrderRecursive will return an array of values if no callback is given as an argument
+  const postOrder = (callback) => {
+    let arr = [];
+
+    _postOrderQueueRecursive(root, arr, callback);
+
+    function _postOrderQueueRecursive(current, arr, callback) {
+      if (current.left) {
+        _postOrderQueueRecursive(current.left, arr, callback);
+      }
+      if (current.right) {
+        _postOrderQueueRecursive(current.right, arr, callback);
+      }
+      callback ? callback(current) : arr.push(current);
+    }
+
+    if (!callback) {
+      return arr;
+    }
+  }
+
+  return { get root() { return root }, insert, deleteItem, find, levelOrderIterative, levelOrderRecursive, inOrder, preOrder, postOrder };
 }
 
 const prettyPrint = (node, prefix = "", isLeft = true) => {
@@ -211,5 +275,5 @@ const prettyPrint = (node, prefix = "", isLeft = true) => {
 
 let newBST = new Tree(sortedArr);
 prettyPrint(newBST.root);
-console.log(newBST.levelOrderRecursive());
+console.log(newBST.postOrder());
 // prettyPrint(newBST.root);
