@@ -35,8 +35,7 @@ const Node = function(value = null) {
 
 const Tree = function(arr) {
 
-  // buildTree takes a sorted array of numbers
-  // and returns a balanced binary search tree
+  // buildTree takes a sorted array of numbers and returns a balanced binary search tree.
   const buildTree = (arr, start = 0, end = arr.length - 1) => {
     // base case
     if (start > end) {
@@ -53,7 +52,7 @@ const Tree = function(arr) {
 
   let root = buildTree(arr);
 
-  // insert(value) inserts a given value into the binary search tree
+  // insert(value) inserts a given value into the binary search tree.
   const insert = (value) => {
     let newNode = new Node(value);
 
@@ -78,7 +77,7 @@ const Tree = function(arr) {
     }
   }
 
-  // delete(value) deletes a given value from the binary search tree
+  // delete(value) deletes a given value from the binary search tree.
   const deleteItem = (value, current = root) => {
     // base case
     if (!current) {
@@ -105,7 +104,7 @@ const Tree = function(arr) {
     return current;
   }
 
-  // finds the value of the given node's inorder predecessor
+  // _findInorderPredecessor(node) finds the value of the given node's inorder predecessor.
   const _findInorderPredecessor = (current) => {
     let predecessorValue = current.value;
     while (current.left) {
@@ -115,7 +114,7 @@ const Tree = function(arr) {
     return predecessorValue;
   }
 
-  // find(value) returns the node with the given value
+  // find(value) returns the node with the given value.
   const find = (value) => {
     let current = root;
 
@@ -132,8 +131,8 @@ const Tree = function(arr) {
   }
 
   // levelOrderIterative iteratively traverses the tree in breadth-first level order
-  // and provides each node as an argument to the optional callback function
-  // levelOrderIterative will return an array of values if no callback is given as an argument
+  // and provides each node as an argument to the optional callback function.
+  // levelOrderIterative will return an array of values if no callback is given as an argument.
   const levelOrderIterative = (callback) => {
     let arr = [];
     let queue = [root];
@@ -159,8 +158,8 @@ const Tree = function(arr) {
   }
 
   // levelOrderRecursive recursively traverses the tree in breadth-first level order
-  // and provides each node as an argument to the optional callback function
-  // levelOrderRecursive will return an array of values if no callback is given as an argument
+  // and provides each node as an argument to the optional callback function.
+  // levelOrderRecursive will return an array of values if no callback is given as an argument.
   const levelOrderRecursive = (callback) => {
     let arr = [];
     _levelOrderQueueRecursive([root], arr, callback);
@@ -189,8 +188,8 @@ const Tree = function(arr) {
   }
 
   // inOrder(callback) traverses the tree in inorder depth-first-order 
-    // and provides each node as an argument to the optional callback function
-  // levelOrderRecursive will return an array of values if no callback is given as an argument
+  // and provides each node as an argument to the optional callback function.
+  // levelOrderRecursive will return an array of values if no callback is given as an argument.
   const inOrder = (callback) => {
     let arr = [];
 
@@ -212,8 +211,8 @@ const Tree = function(arr) {
   }
 
   // preOrder(callback) traverses the tree in preOrder depth-first-order 
-  // and provides each node as an argument to the optional callback function
-  // levelOrderRecursive will return an array of values if no callback is given as an argument
+  // and provides each node as an argument to the optional callback function.
+  // levelOrderRecursive will return an array of values if no callback is given as an argument.
   const preOrder = (callback) => {
     let arr = [];
 
@@ -235,8 +234,8 @@ const Tree = function(arr) {
   }
 
   // postOrder(callback) traverses the tree in postOrder depth-first-order 
-  // and provides each node as an argument to the optional callback function
-  // levelOrderRecursive will return an array of values if no callback is given as an argument
+  // and provides each node as an argument to the optional callback function.
+  // levelOrderRecursive will return an array of values if no callback is given as an argument.
   const postOrder = (callback) => {
     let arr = [];
 
@@ -257,7 +256,50 @@ const Tree = function(arr) {
     }
   }
 
-  return { get root() { return root }, insert, deleteItem, find, levelOrderIterative, levelOrderRecursive, inOrder, preOrder, postOrder };
+  // height(node) returns the given node’s height.
+  // height is defined as the number of edges in the longest path from a given node to a leaf node.
+  const height = (node) => {
+    // base case
+    if (!node) {
+      return 0;
+    }
+    return 1 + Math.max(height(node.left), height(node.right));
+  }
+
+  // depth(node) returns the given node’s depth.
+  // depth is defined as the number of edges in the path from a given node to the tree’s root node.
+  const depth = (node) => {
+    return _findDepthRecursive([root], node);
+  }
+
+  function _findDepthRecursive(queue, node) {
+    // throw error if end of tree has been reached
+    if (queue.length <= 0) {
+      throw new Error(`The given node was not found.`);
+    }
+    let newQueue = [];
+    while (queue.length > 0) {
+      let current = queue.shift();
+      if (current === node) {
+        return 0;
+      }
+      if (current.left) {
+        newQueue.push(current.left);
+      }
+      if (current.right) {
+        newQueue.push(current.right);
+      }
+    }
+    return 1 + _findDepthRecursive(newQueue, node);
+  }
+
+  const isBalanced = () => {
+    let leftHeight = height(root.left);
+    let rightHeight = height(root.right);
+    return leftHeight === rightHeight || leftHeight === rightHeight + 1 || leftHeight === rightHeight - 1;
+  }
+
+  return { get root() { return root }, insert, deleteItem, find, levelOrderIterative, levelOrderRecursive, inOrder, preOrder, postOrder, height, depth, isBalanced };
 }
 
 const prettyPrint = (node, prefix = "", isLeft = true) => {
@@ -275,5 +317,6 @@ const prettyPrint = (node, prefix = "", isLeft = true) => {
 
 let newBST = new Tree(sortedArr);
 prettyPrint(newBST.root);
-console.log(newBST.postOrder());
+// prettyPrint(newBST.root);
+console.log(newBST.isBalanced());
 // prettyPrint(newBST.root);
